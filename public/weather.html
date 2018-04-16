@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Weather</title>
+</head>
+
+<body>
+    <h1>Weather</h1>
+    <input type='keyword' id='weather' placeholder='Enter a location' />
+    <button id='accept'>Enter</button>
+    <div id='info'></div>
+    <a href="/weather">Weather</a>
+    <a href="/picture">Picture</a>
+    <script type="text/javascript">
+    const request = require('request');
+
+    var getAddress = (address, callback) => {
+
+        request({
+            url: 'http://maps.googleapis.com/maps/api/geocode/json' +
+                '?address=' + encodeURIComponent(address),
+            json: true
+        }, (error, response, body) => {
+            if (error) {
+                callback('Cannot connect to Google Maps');
+            } else if (body.status === 'ZERO_RESULTS') {
+                callback('Cannot find requested address');
+            } else if (body.status === 'OK') {
+                callback(undefined, {
+                    address: body.results[0].formatted_address,
+                    latitude: body.results[0].geometry.location.lat,
+                    longitude: body.results[0].geometry.location.lng,
+                });
+
+            };
+
+            var getWeather = (latitude, longitude, callback) => {
+
+                request({
+                    url: 'https://api.darksky.net/forecast/' +
+                        '1d78e839bbe2c91f33931880d5daee83/' + latitude + ',' + longitude,
+                    json: true
+
+                }, (error, response, body) => {
+                    `Your Location: ${body.formatted_address}`
+                    `The weather today: ${body.currently.summary}`
+                    `The temperature: ${body.currently.temperature} F`
+                });
+            };
+
+
+            document.getElementbyID('accept').addEventListener('click', (location) => {
+                address = document.getElementbyID('location').value;
+                address_string = getAddress(address);
+                var results = JSON.stringify(results, undefined, 2);
+                var parsed = JSON.parse(results);
+                darksky.getWeather(parsed.latitude, parsed.longitude)
+            })
+        })
+    }
+    </script>
+</body>
+
+</html>
